@@ -1,5 +1,6 @@
 import Head from 'next/head';
-import util from '@/config/util.js';
+import util from '@/services/util.js';
+import api from '@/services/api.js';
 import { useEffect, useState, useCallback } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -13,76 +14,32 @@ import {
 import History from '@/components/History';
 import Navbar from '@/components/Navbar';
 
-const fetchWeatherHistory = async () => {
-  const url = `${util.API_URL}/api/history`;
-
-  try {
-    const data = await util.handleFetch(url);
-    // Check if data is undefined
-    if (!data) {
-      console.warn("No weather data retrieved");
-      return;
-    }
-
-    return data;
-  } catch (error) {
-    console.error('Error occurred:', error.message);
-    toast(error.message, { type: "error" });
-  }
-};
-
-function extractWeatherData(jsonData) {
-  const {
-    weather_id,
-    name,
-    sys: { country },
-    main: { temp: temperature, humidity },
-    wind: { speed: windSpeed },
-  } = jsonData;
-
-  return { name, country, temperature: parseFloat(temperature) - 273.15, wind: windSpeed, humidity, id: weather_id };
-}
 
 export default function Home() {
   const [recentSearches, setrecentSearches] = useState([]);
-  const [weatherData, setWeatherData] = useState([]);
   const [weatherHistory, setWeatherHistory] = useState([]);
 
-  const handleChange = useCallback((value) => {
+
+  const handleChange = useCallback(async (value) => {
     if (!value) return;
     setrecentSearches([value, ...recentSearches]);
-    fetchWeatherData(value);
-  }, [recentSearches]);
-
-  const fetchWeatherData = useCallback(async (cityName) => {
-    const url = `${util.API_URL}/api/weather?city=${cityName}`;
-
-    try {
-      const data = await util.handleFetch(url, {});
-      if (!data) return;
-      if (data.status !== "success") {
-        toast(data.message, { type: "error" });
-        return;
-      }
-      setWeatherData(data.data);
-     setWeatherHistory(prevHistory => [extractWeatherData(data.data), ...prevHistory]);
-    } catch (error) {
-      console.error('Error occurred:', error.message);
+    const weatherData = await api.fetchWeatherData(value);
+    if (weatherData) {
+      setWeatherHistory(prevHistory => [weatherData, ...prevHistory]);
     }
-  }, [weatherHistory]);
+  }, [recentSearches, weatherHistory]);
 
   useEffect(() => {
     (async () => {
       try {
-        const data = await fetchWeatherHistory();
-
+        const data = await api.fetchWeatherHistory();
         if (data.status !== "success") {
           toast(data.message, { type: "error" });
           return;
         }
 
         const weatherHistoryData = data.data.map((item) => {
-          return extractWeatherData(item);
+          return util.extractWeatherData(item);
         });
 
         setWeatherHistory(weatherHistoryData);
@@ -100,9 +57,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div>
-        <Navbar />
-      </div>
+      <Navbar />
       <div className="container">
         <ToastContainer />
         <Grid container spacing={6}>
@@ -122,7 +77,7 @@ export default function Home() {
           <Grid item xs={12}>
             <Card>
               <CardHeader title='Search History' titleTypographyProps={{ variant: 'h6' }} sx={{ backgroundColor: '#c3cccd' }} />
-              <History weatherData={weatherData} rows={weatherHistory} setWeatherHistory={setWeatherHistory} />
+              <History rows={weatherHistory} setWeatherHistory={setWeatherHistory} />
             </Card>
           </Grid>
         </Grid>
