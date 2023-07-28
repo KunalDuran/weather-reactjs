@@ -152,12 +152,12 @@ const HistoryTable = ({ rows, setWeatherHistory }) => {
                                 <DeleteIcon fontSize='medium' sx={{ mr: 2 }} />
                                 Delete
                               </MenuItem>
-                              <Link href={``} passHref>
-                                <MenuItem>
+                              
+                                <MenuItem disabled>
                                   <EditIcon fontSize='small' sx={{ mr: 2 }} />
                                   Edit
                                 </MenuItem>
-                              </Link>
+                              
                             </Menu>
                           </Box>
                         </TableCell>
