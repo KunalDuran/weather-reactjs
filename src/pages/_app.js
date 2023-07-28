@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@/styles/globals.css'
+import 'react-toastify/dist/ReactToastify.min.css';
 
 import { AuthProvider } from '@/config/Auth'
 

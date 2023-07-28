@@ -1,10 +1,9 @@
 // ** React Imports
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useEffect, useState, useCallback } from 'react'
 import { toast } from 'react-toastify'
 import util from './util'
 import { useRouter } from 'next/router'
 import jwt from 'jsonwebtoken'
-
 
 const defaultProvider = {
     user: null,
@@ -15,86 +14,90 @@ const defaultProvider = {
 
 const AuthContext = createContext(defaultProvider)
 
-
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(defaultProvider.user)
-
     const router = useRouter()
+
     useEffect(() => {
         const initAuth = async () => {
             const storedToken = window.localStorage.getItem('token')
             if (storedToken) {
-                const response = await authme(storedToken)
-                console.log(response)
-                if (response.error) {
-                    localStorage.removeItem('token')
-                } else {
-                    setUser(response.Username)
+                try {
+                    const response = await authme(storedToken)
+                    if (response.error) {
+                        localStorage.removeItem('token')
+                    } else {
+                        setUser(response.Username)
+                    }
+                } catch (error) {
+                    console.error('Error occurred:', error.message);
                 }
             } else {
-                router.push('/login')
+                // Only redirect to login if the current route is not login or register
+                if (!['/login', '/register'].includes(router.pathname)) {
+                    router.push('/login')
+                }
             }
         }
         initAuth()
-    }, [])
+    }, [router])
+    
 
-
-    const handleLogin = (username, password) => {
-        fetch(`${util.API_URL}/api/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.status !== "success"){
-                    toast(data.message, { type: "success" });
-                    return
-                }
-                localStorage.setItem('token', data.data.token);
-
-                toast("User logged in successfully", { type: "success" });
-                window.location.href = '/'; 
+    const handleLogin = useCallback(async (username, password) => {
+        try {
+            const response = await fetch(`${util.API_URL}/api/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
             })
-            .catch((error) => {
-                console.error('Error logging in:', error);
-            });
-    }
 
-    const handleLogout = () => {
+            if (!response.ok) {
+                toast("Invalid credentials", { type: "error" })
+                return
+            }
+
+            const data = await response.json()
+            if (data.status !== "success"){
+                toast(data.message, { type: "error" })
+                return
+            }
+            localStorage.setItem('token', data.data.token)
+            toast("User logged in successfully", { type: "success" })
+            router.push('/')
+        } catch (error) {
+            console.error('Error logging in:', error)
+        }
+    }, [router])
+
+    const handleLogout = useCallback(() => {
         setUser(null)
         window.localStorage.removeItem('token')
         router.push('/login')
-    }
+    }, [router])
 
-    const handleRegister = (username, password, dob) => {
-        fetch(`${util.API_URL}/api/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password, birth_date: dob }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-
-                if (data.status !== "success") {
-                    toast(data.message, { type: "success" });
-                    return
-                }
-
-                toast("User registered successfully", { type: "success" });
-                // redirect to login page
-                window.location.href = '/login';
+    const handleRegister = useCallback(async (username, password, dob) => {
+        try {
+            const response = await fetch(`${util.API_URL}/api/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password, birth_date: dob }),
             })
-            .catch((error) => {
-                // Handle any errors that occur during the registration process
-                toast(error.message, { type: "error" });
-                console.error('Error registering user:', error);
-            });
-    }
+            const data = await response.json()
+            if (data.status !== "success") {
+                toast(data.message, { type: "info" })
+                return
+            }
+            toast("User registered successfully", { type: "success" })
+            router.push('/login')
+        } catch (error) {
+            toast(error.message, { type: "error" })
+            console.error('Error registering user:', error)
+        }
+    }, [router])
 
     const values = {
         user,
@@ -107,12 +110,16 @@ const AuthProvider = ({ children }) => {
 }
 
 async function authme(token) {
-    const decoded = jwt.decode(token, { complete: true })
-    if (decoded) {
-        const userData = decoded.payload
-        return userData
-    } else {
-        return { error: "not decoded" }
+    try {
+        const decoded = jwt.decode(token, { complete: true })
+        if (decoded) {
+            const userData = decoded.payload
+            return userData
+        } else {
+            return { error: "not decoded" }
+        }
+    } catch (error) {
+        console.error('Error occurred:', error.message);
     }
 }
 

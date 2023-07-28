@@ -1,6 +1,6 @@
-import Head from 'next/head'
-import util from '@/config/util.js'
-import { useEffect, useState } from 'react';
+import Head from 'next/head';
+import util from '@/config/util.js';
+import { useEffect, useState, useCallback } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {
@@ -10,7 +10,6 @@ import {
   Card,
   CardHeader
 } from "@mui/material";
-
 import History from '@/components/History';
 import Navbar from '@/components/Navbar';
 
@@ -32,7 +31,6 @@ const fetchWeatherHistory = async () => {
   }
 };
 
-
 function extractWeatherData(jsonData) {
   const {
     weather_id,
@@ -50,36 +48,14 @@ export default function Home() {
   const [weatherData, setWeatherData] = useState([]);
   const [weatherHistory, setWeatherHistory] = useState([]);
 
-  const handleChange = (value) => {
+  const handleChange = useCallback((value) => {
     if (!value) return;
     setrecentSearches([value, ...recentSearches]);
     fetchWeatherData(value);
-  };
+  }, [recentSearches]);
 
-  useEffect(() => {
-    fetchWeatherHistory()
-      .then((data) => {
-
-        if (data.status !== "success") {
-          toast(data.message, { type: "error" });
-          return;
-        }
-
-
-        const weatherHistory = data.data.map((item) => {
-          return extractWeatherData(item);
-        });
-
-        setWeatherHistory(weatherHistory);
-      })
-      .catch((error) => {
-        console.error("Error fetching weather history: ", error);
-      });
-  }, []);
-
-
-  const fetchWeatherData = async (cityName) => {
-    const url = `${util.API_URL}/api/weather?city=${cityName}`
+  const fetchWeatherData = useCallback(async (cityName) => {
+    const url = `${util.API_URL}/api/weather?city=${cityName}`;
 
     try {
       const data = await util.handleFetch(url, {});
@@ -88,14 +64,33 @@ export default function Home() {
         toast(data.message, { type: "error" });
         return;
       }
-      console.log(data);
       setWeatherData(data.data);
-      // append data to weatherHistory
       setWeatherHistory([extractWeatherData(data.data), ...weatherHistory]);
     } catch (error) {
       console.error('Error occurred:', error.message);
     }
-  };
+  }, [weatherHistory]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await fetchWeatherHistory();
+
+        if (data.status !== "success") {
+          toast(data.message, { type: "error" });
+          return;
+        }
+
+        const weatherHistoryData = data.data.map((item) => {
+          return extractWeatherData(item);
+        });
+
+        setWeatherHistory(weatherHistoryData);
+      } catch (error) {
+        console.error("Error fetching weather history: ", error);
+      }
+    })();
+  }, []);
 
   return (
     <>

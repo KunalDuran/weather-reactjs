@@ -1,5 +1,4 @@
-// ** React Imports
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 
 // ** MUI Imports
 import Paper from '@mui/material/Paper'
@@ -53,9 +52,10 @@ const columns = [
     format: value => value.toFixed(2)
   }
 ]
+
 const deleteWeatherHistoryByID = async (weatherID) => {
   const url = `${util.API_URL}/api/history/delete?weatherID=${weatherID}`;
-  
+
   try {
     const data = await util.handleFetch(url, {});
     return data;
@@ -64,6 +64,7 @@ const deleteWeatherHistoryByID = async (weatherID) => {
     console.error('Error occurred:', error.message);
   }
 };
+
 
 const HistoryTable = ({ rows, setWeatherHistory }) => {
   // ** States
@@ -74,30 +75,30 @@ const HistoryTable = ({ rows, setWeatherHistory }) => {
 
   const rowOptionsOpen = Boolean(anchorEl)
 
-  const handleRowOptionsClick = event => {
-    setActiveOption(event.currentTarget.getAttribute('data-item'))
-    setAnchorEl(event.currentTarget)
-  }
-  const handleRowOptionsClose = () => {
-    setAnchorEl(null)
-  }
-
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = useCallback((event, newPage) => {
     setPage(newPage)
-  }
+  }, [])
 
-  const handleChangeRowsPerPage = event => {
+  const handleChangeRowsPerPage = useCallback(event => {
     setRowsPerPage(+event.target.value)
     setPage(0)
-  }
+  }, [])
 
-  const handleDelete = (event) => {
+  const handleRowOptionsClick = useCallback(event => {
+    setActiveOption(event.currentTarget.getAttribute('data-item'))
+    setAnchorEl(event.currentTarget)
+  }, [])
+
+  const handleRowOptionsClose = useCallback(() => {
+    setAnchorEl(null)
+  }, [])
+
+  const handleDelete = useCallback((event) => {
     event.preventDefault()
     setAnchorEl(null)
     deleteWeatherHistoryByID(activeOption).then((data) => {
       // remove the deleted item from the table
       toast("Row deleted successfully", { type: "error" });
-
 
       const newWeatherHistory = rows.filter((item) => {
         return item.id !== parseInt(activeOption)
@@ -105,8 +106,11 @@ const HistoryTable = ({ rows, setWeatherHistory }) => {
       )
       setWeatherHistory(newWeatherHistory)
 
+    }).catch((error) => {
+      console.error('Error occurred:', error.message);
     });
-  }
+  }, [activeOption, rows])
+
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
@@ -125,11 +129,11 @@ const HistoryTable = ({ rows, setWeatherHistory }) => {
             {rows && rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => {
               return (
                 <TableRow hover role='checkbox' tabIndex={-1} key={row.code}>
-                  {columns.map((column, idx) => {
+                  {columns.map((column) => {
                     const value = row[column.id]
                     if (column.id === 'option') {
                       return (
-                        <TableCell key={idx} align={column.align}>
+                        <TableCell key={column.id} align={column.align}>
                           <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right' }}>
                             <IconButton data-item={row.id} onClick={handleRowOptionsClick} size='small' sx={{ alignItems: 'right' }}>
                               <MoreVertIcon fontSize='small' />
@@ -152,19 +156,19 @@ const HistoryTable = ({ rows, setWeatherHistory }) => {
                                 <DeleteIcon fontSize='medium' sx={{ mr: 2 }} />
                                 Delete
                               </MenuItem>
-                              
-                                <MenuItem disabled>
+                              <Link href={``} passHref>
+                                <MenuItem>
                                   <EditIcon fontSize='small' sx={{ mr: 2 }} />
                                   Edit
                                 </MenuItem>
-                              
+                              </Link>
                             </Menu>
                           </Box>
                         </TableCell>
                       )
                     }
                     return (
-                      <TableCell key={idx} align={column.align}>
+                      <TableCell key={column.id} align={column.align}>
                         {column.format && typeof value === 'number' ? column.format(value) : value}
                       </TableCell>
                     )
