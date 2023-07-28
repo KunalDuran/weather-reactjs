@@ -33,7 +33,6 @@ const AuthProvider = ({ children }) => {
                     console.error('Error occurred:', error.message);
                 }
             } else {
-                // Only redirect to login if the current route is not login or register
                 if (!['/login', '/register'].includes(router.pathname)) {
                     router.push('/login')
                 }

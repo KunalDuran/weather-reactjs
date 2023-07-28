@@ -22,7 +22,9 @@ export default function Home() {
 
   const handleChange = useCallback(async (value) => {
     if (!value) return;
-    setrecentSearches([value, ...recentSearches]);
+    if (!recentSearches.includes(value)) {
+      setrecentSearches([value, ...recentSearches]);
+    }
     const weatherData = await api.fetchWeatherData(value);
     if (weatherData) {
       setWeatherHistory(prevHistory => [weatherData, ...prevHistory]);

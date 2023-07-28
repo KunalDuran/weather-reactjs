@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from 'react'
 
-// ** MUI Imports
 import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableRow from '@mui/material/TableRow'
@@ -9,14 +8,8 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TablePagination from '@mui/material/TablePagination'
-import Link from 'next/link'
-import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import api from '@/services/api.js'
 import { toast } from 'react-toastify';
 
@@ -46,7 +39,7 @@ const columns = [
   },
   {
     id: 'option',
-    label: 'Option',
+    label: 'Action',
     minWidth: 170,
     align: 'right',
     format: value => value.toFixed(2)
@@ -56,13 +49,8 @@ const columns = [
 const ROWS_PER_PAGE_OPTIONS = [10, 25, 100];
 
 const HistoryTable = ({ rows, setWeatherHistory }) => {
-  // ** States
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [activeOption, setActiveOption] = useState('');
-
-  const rowOptionsOpen = Boolean(anchorEl)
 
   const handleChangePage = useCallback((event, newPage) => {
     setPage(newPage)
@@ -73,65 +61,32 @@ const HistoryTable = ({ rows, setWeatherHistory }) => {
     setPage(0)
   }, [])
 
-  const handleRowOptionsClick = useCallback(event => {
-    setActiveOption(event.currentTarget.getAttribute('data-item'))
-    setAnchorEl(event.currentTarget)
-  }, [])
 
-  const handleRowOptionsClose = useCallback(() => {
-    setAnchorEl(null)
-  }, [])
-
-  const handleDelete = useCallback((event) => {
+  const handleDelete = useCallback((event, activeOption) => {
     event.preventDefault()
-    setAnchorEl(null)
     api.deleteWeatherHistoryByID(activeOption).then((data) => {
-      // remove the deleted item from the table
+      if (data.status !== "success") {
+        toast(data.message, { type: "error" });
+        return;
+      }
       toast("Row deleted successfully", { type: "error" });
-
       const newWeatherHistory = rows.filter((item) => {
         return item.id !== parseInt(activeOption)
       })
       setWeatherHistory(newWeatherHistory)
     }).catch((error) => {
+      toast("Error deleting row", { type: "error" });
       console.error('Error occurred:', error.message);
     });
-  }, [activeOption, rows])
+  }, [rows])
 
   const renderCell = (column, row) => {
     if (column.id === 'option') {
       return (
         <TableCell key={column.id} align={column.align}>
-          <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right' }}>
-            <IconButton data-item={row.id} onClick={handleRowOptionsClick} size='small' sx={{ alignItems: 'right' }}>
-              <MoreVertIcon fontSize='small' />
-            </IconButton>
-            <Menu
-              keepMounted
-              anchorEl={anchorEl}
-              open={rowOptionsOpen}
-              onClose={handleRowOptionsClose}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right'
-              }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right'
-              }}
-            >
-              <MenuItem onClick={handleDelete}>
-                <DeleteIcon fontSize='medium' sx={{ mr: 2 }} />
-                Delete
-              </MenuItem>
-              <Link href={``} passHref>
-                <MenuItem>
-                  <EditIcon fontSize='small' sx={{ mr: 2 }} />
-                  Edit
-                </MenuItem>
-              </Link>
-            </Menu>
-          </Box>
+          <IconButton onClick={(e) => handleDelete(e, row.id)}>
+            <DeleteOutlineOutlinedIcon fontSize='medium' color='error' sx={{ mr: 2 }} />
+          </IconButton>
         </TableCell>
       )
     }
@@ -157,9 +112,9 @@ const HistoryTable = ({ rows, setWeatherHistory }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows && rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => {
-              return (  
-                <TableRow hover role='checkbox' tabIndex={-1} key={row.name}>
+            {rows && rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, idx) => {
+              return (
+                <TableRow key={idx} hover role='checkbox' tabIndex={-1} >
                   {columns.map((column, idx) => (
                     <React.Fragment key={column.id + idx}>
                       {renderCell(column, row)}

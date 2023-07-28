@@ -13,9 +13,7 @@ function RegistrationForm() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
         register(username, password, dob);
-
     };
 
     return (
@@ -23,11 +21,8 @@ function RegistrationForm() {
         <div className="container">
             <ToastContainer />
             <section className="container text-center">
-                <div className="p-5 bg-image"></div>
-
-                <div className="card mx-4 mx-md-5 shadow-5-strong">
+                <div className="card mx-4 mx-md-5 shadow">
                     <div className="card-body py-5 px-md-5">
-
                         <div className="row d-flex justify-content-center">
                             <div className="col-lg-8">
                                 <h2 className="fw-bold mb-5">Sign Up</h2>
@@ -35,28 +30,24 @@ function RegistrationForm() {
                                     <div className="row">
                                         <div className="col-md-6 mb-4">
                                             <div className="form-outline">
-                                                <label className="form-label" for="username">Username</label>
-                                                <input type="text" id="username" className="form-control" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                                                <label className="form-label" htmlFor="username">Username</label>
+                                                <input type="email" id="username" className="form-control" value={username} onChange={(e) => setUsername(e.target.value)} required />
                                             </div>
                                         </div>
                                         <div className="col-md-6 mb-4">
                                             <div className="form-outline">
-                                                <label className="form-label" for="dob">Date of Birth</label>
+                                                <label className="form-label" htmlFor="dob">Date of Birth</label>
                                                 <input type="date" id="dob" className="form-control" value={dob} onChange={(e) => setDOB(e.target.value)} required />
                                             </div>
                                         </div>
                                     </div>
-
-
                                     <div className="form-outline mb-4">
-                                        <label className="form-label" for="pass">Password</label>
+                                        <label className="form-label" htmlFor="pass">Password</label>
                                         <input type="password" id="pass" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} required />
                                     </div>
-
                                     <button type="submit" className="btn btn-primary btn-block mb-4">
                                         Signup
                                     </button>
-
                                 </form>
                                 <p>Already have an account? <Link href="/login" passHref>Login</Link></p>
                             </div>

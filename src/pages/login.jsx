@@ -20,8 +20,7 @@ function LoginForm() {
             <ToastContainer />
             <div className='container'>
                 <section className="text-center">
-                    <div className="p-5 bg-image"></div>
-                    <div className="card mx-4 mx-md-5 shadow-5-strong">
+                    <div className="card mx-4 mx-md-5 shadow">
                         <div className="card-body py-5 px-md-5">
                             <div className="row d-flex justify-content-center">
                                 <div className="col-lg-8">
@@ -30,22 +29,19 @@ function LoginForm() {
                                         <div className="row">
                                             <div className="col mb-4">
                                                 <div className="form-outline">
-                                                    <label className="form-label" for="username">Username</label>
-                                                    <input type="text" id="username" className="form-control" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                                                    <label className="form-label" htmlFor="username">Username</label>
+                                                    <input type="email" id="username" className="form-control" value={username} onChange={(e) => setUsername(e.target.value)} required />
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="form-outline mb-4">
-                                            <label className="form-label" for="pass">Password</label>
+                                            <label className="form-label" htmlFor="pass">Password</label>
                                             <input type="password" id="pass" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} required />
                                         </div>
-
                                         <button type="submit" className="btn btn-primary btn-block mb-4">
                                             Login
                                         </button>
-
                                     </form>
-                                    {/* route to register page if new user */}
                                     <p>Don't have an account? <Link href="/register" passHref>Register</Link></p>
                                 </div>
                             </div>
@@ -54,7 +50,6 @@ function LoginForm() {
                 </section>
             </div>
         </>
-
     );
 }
 

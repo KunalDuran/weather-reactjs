@@ -53,5 +53,20 @@ const deleteWeatherHistoryByID = async (weatherID) => {
 };
 
 
-export default {fetchWeatherData, fetchWeatherHistory, deleteWeatherHistoryByID} ;
+const bulkDeleteWeatherHistory = async (weatherIDs) => {
+  const url = `${util.API_URL}/api/history/bulkdelete`;
+
+  try {
+    const data = await util.handleFetch(url, {
+      method: "POST",
+      body: JSON.stringify({ weatherIDs }),
+    });
+    return data;
+
+  } catch (error) {
+    console.error('Error occurred:', error.message);
+  }
+};
+
+export default {fetchWeatherData, fetchWeatherHistory, deleteWeatherHistoryByID, bulkDeleteWeatherHistory} ;
 
