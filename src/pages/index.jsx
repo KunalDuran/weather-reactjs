@@ -65,7 +65,7 @@ export default function Home() {
         return;
       }
       setWeatherData(data.data);
-      setWeatherHistory([extractWeatherData(data.data), ...weatherHistory]);
+     setWeatherHistory(prevHistory => [extractWeatherData(data.data), ...prevHistory]);
     } catch (error) {
       console.error('Error occurred:', error.message);
     }
