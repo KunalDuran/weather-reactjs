@@ -18,7 +18,7 @@ const columns = [
   { id: 'country', label: 'Country', minWidth: 100 },
   {
     id: 'temperature',
-    label: 'Temprature (C)',
+    label: 'Temperature (C)',
     minWidth: 170,
     align: 'right',
     format: value => value.toLocaleString('en-US')

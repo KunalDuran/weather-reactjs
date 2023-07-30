@@ -25,10 +25,9 @@ async function handleFetch(url, options = {}) {
   };
 
   try {
-
     const response = await fetch(url, requestOptions);
     if (response.status === 401) {
-      toast("Please login first", { type: "error" });
+      toast("Please login first", { type: "default" });
       return;
     }
 

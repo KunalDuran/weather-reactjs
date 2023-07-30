@@ -43,7 +43,7 @@ const deleteWeatherHistoryByID = async (weatherID) => {
   const url = `${util.API_URL}/api/history/delete?weatherID=${weatherID}`;
 
   try {
-    const data = await util.handleFetch(url, {});
+    const data = await util.handleFetch(url, {method: "DELETE"});
     return data;
 
   } catch (error) {
@@ -57,7 +57,7 @@ const bulkDeleteWeatherHistory = async (weatherIDs) => {
 
   try {
     const data = await util.handleFetch(url, {
-      method: "POST",
+      method: "DELETE",
       body: JSON.stringify({ weatherIDs }),
     });
     return data;
