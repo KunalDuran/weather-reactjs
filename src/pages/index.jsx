@@ -37,7 +37,7 @@ export default function Home() {
     (async () => {
       try {
         const data = await api.fetchWeatherHistory();
-        if (data.status !== "success") {
+        if (data.status === "error") {
           toast(data.message, { type: "error" });
           return;
         }
