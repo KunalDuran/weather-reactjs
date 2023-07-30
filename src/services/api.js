@@ -7,7 +7,6 @@ const fetchWeatherHistory = async () => {
 
   try {
     const data = await util.handleFetch(url);
-    // Check if data is undefined
     if (!data) {
       console.warn("No weather data retrieved");
       return;

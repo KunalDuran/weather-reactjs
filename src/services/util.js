@@ -13,14 +13,12 @@ async function handleFetch(url, options = {}) {
     throw error;
   }
 
-  // Set the Authorization header with the token if available
   const headers = {
     'Content-Type': 'application/json',
     ...(token && { 'Authorization': `${token}` }),
     ...options.headers
   };
 
-  // Merge the provided options with the headers
   const requestOptions = {
     ...options,
     headers,
