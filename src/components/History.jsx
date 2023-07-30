@@ -62,14 +62,16 @@ const HistoryTable = ({ rows, setWeatherHistory }) => {
   }, [])
 
 
-  const handleDelete = useCallback((event, activeOption) => {
+  const handleDelete = useCallback((event) => {
     event.preventDefault()
+    const activeOption = event.currentTarget.getAttribute('data-row-id');
+
     api.deleteWeatherHistoryByID(activeOption).then((data) => {
       if (data.status !== "success") {
         toast(data.message, { type: "error" });
         return;
       }
-      toast("Row deleted successfully", { type: "error" });
+      toast("Row deleted successfully", { type: "info" });
       const newWeatherHistory = rows.filter((item) => {
         return item.id !== parseInt(activeOption)
       })
@@ -84,7 +86,7 @@ const HistoryTable = ({ rows, setWeatherHistory }) => {
     if (column.id === 'option') {
       return (
         <TableCell key={column.id} align={column.align}>
-          <IconButton onClick={(e) => handleDelete(e, row.id)}>
+          <IconButton data-row-id={row.id} onClick={handleDelete}>
             <DeleteOutlineOutlinedIcon fontSize='medium' color='error' sx={{ mr: 2 }} />
           </IconButton>
         </TableCell>
