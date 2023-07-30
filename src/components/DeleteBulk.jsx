@@ -11,7 +11,7 @@ export default function DeleteBulk({setWeatherHistory}) {
                 toast(data.message, { type: "error" });
                 return;
             }
-            toast("Row deleted successfully", { type: "error" });
+            toast("History deleted successfully", { type: "error" });
             setWeatherHistory([])
         }).catch((error) => {
             toast("Error deleting history", { type: "error" });
