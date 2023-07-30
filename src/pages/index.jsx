@@ -12,7 +12,9 @@ import {
   CardHeader
 } from "@mui/material";
 import History from '@/components/History';
+import DeleteBulk from '@/components/DeleteBulk';
 import Navbar from '@/components/Navbar';
+
 
 
 export default function Home() {
@@ -68,7 +70,6 @@ export default function Home() {
               id="autocomplete"
               freeSolo
               autoComplete
-              autoHighlight
               options={recentSearches}
               renderInput={(params) => (
                 <TextField {...params} label="Search" />
@@ -76,10 +77,13 @@ export default function Home() {
               onChange={(e, value) => handleChange(value)}
             />
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} sx={{marginBottom : 4}}>
             <Card>
-              <CardHeader title='Search History' titleTypographyProps={{ variant: 'h6' }} sx={{ backgroundColor: '#c3cccd' }} />
-              <History rows={weatherHistory} setWeatherHistory={setWeatherHistory} />
+              <CardHeader title='Search History' titleTypographyProps={{ variant: 'h6' }} sx={{ backgroundColor: '#c3cccd' }} 
+              action={
+                <DeleteBulk  setWeatherHistory={setWeatherHistory} />
+              } />
+              <History  rows={weatherHistory} setWeatherHistory={setWeatherHistory} />
             </Card>
           </Grid>
         </Grid>

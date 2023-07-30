@@ -30,7 +30,7 @@ function RegistrationForm() {
                                     <div className="row">
                                         <div className="col-md-6 mb-4">
                                             <div className="form-outline">
-                                                <label className="form-label" htmlFor="username">Username</label>
+                                                <label className="form-label" htmlFor="username">Username (*email)</label>
                                                 <input type="email" id="username" className="form-control" value={username} onChange={(e) => setUsername(e.target.value)} required />
                                             </div>
                                         </div>

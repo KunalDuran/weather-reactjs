@@ -136,7 +136,7 @@ const HistoryTable = ({ rows, setWeatherHistory }) => {
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+  />
     </Paper>
   )
 }

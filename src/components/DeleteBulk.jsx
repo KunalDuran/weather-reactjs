@@ -1,8 +1,9 @@
 import React from 'react'
 import api from '@/services/api.js';
 import { toast } from 'react-toastify';
+import { useCallback } from 'react';
 
-export default function DeleteBulk() {
+export default function DeleteBulk({setWeatherHistory}) {
     const handleDelete = useCallback((event, activeOption) => {
         event.preventDefault()
         api.bulkDeleteWeatherHistory(activeOption).then((data) => {
@@ -16,10 +17,11 @@ export default function DeleteBulk() {
             toast("Error deleting history", { type: "error" });
             console.error('Error occurred:', error.message);
         });
-    }, [rows])
+    }, [])
+
   return (
     <div>
-        <h1>DeleteBulk</h1>
+        <button className='btn btn-secondary' onClick={handleDelete}>Clear Search History</button>
     </div>
   )
 }
