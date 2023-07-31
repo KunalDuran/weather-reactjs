@@ -37,6 +37,7 @@ The Weather Web Application offers the following features:
 
 To set up and run the Weather Web Application locally, follow these steps:
 
+*\*Before running this make sure to run weather-api available on https://github.com/KunalDuran/weather-api and change API_URL in src/services/util.js to "http://localhost:8080"*
 1. Clone the project repository from [GitHub Repo URL].
 
 2. Navigate to the project directory in your terminal.
